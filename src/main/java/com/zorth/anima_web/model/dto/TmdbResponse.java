@@ -6,28 +6,49 @@ import java.util.List;
 
 @Data
 public class TmdbResponse {
-    private Integer page;
-    private List<TmdbTvShow> results;
+    private int page;
+    private List<TmdbAnime> results;
     
     @JsonProperty("total_pages")
-    private Integer totalPages;
+    private int totalPages;
     
     @JsonProperty("total_results")
-    private Integer totalResults;
+    private int totalResults;
     
     @Data
-    public static class TmdbTvShow {
+    public static class TmdbAnime {
         private Long id;
-        private String name;
+        private boolean adult;
+        
+        @JsonProperty("backdrop_path")
+        private String backdropPath;
+        
+        @JsonProperty("genre_ids")
+        private List<Integer> genreIds;
+        
+        @JsonProperty("origin_country")
+        private List<String> originCountry;
+        
+        @JsonProperty("original_language")
+        private String originalLanguage;
+        
+        @JsonProperty("original_name")
         private String originalName;
         private String overview;
-        private String firstAirDate;
-        private String status;
+        private double popularity;
+        
+        @JsonProperty("poster_path")
         private String posterPath;
-        private String backdropPath;
-        private Double popularity;
-        private Double voteAverage;
-        private Integer voteCount;
-        private List<Integer> genreIds;
+        
+        @JsonProperty("first_air_date")
+        private String firstAirDate;
+        private String name;
+        
+        @JsonProperty("vote_average")
+        private double voteAverage;
+        
+        @JsonProperty("vote_count")
+        private int voteCount;
+        private String status;
     }
 } 

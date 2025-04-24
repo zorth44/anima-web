@@ -4,19 +4,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "anime_genres")
+@Table(name = "origin_countries")
 @Data
-public class AnimeGenre {
+public class OriginCountry {
     @EmbeddedId
-    private AnimeGenreId id;
+    private OriginCountryId id;
     
     @ManyToOne
     @MapsId("animeId")
     @JoinColumn(name = "anime_id")
     private Anime anime;
-    
-    @ManyToOne
-    @MapsId("genreId")
-    @JoinColumn(name = "genre_id")
-    private Genre genre;
 } 

@@ -9,6 +9,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.zorth.anima_web.config.TmdbConfig;
 import com.zorth.anima_web.model.dto.TmdbResponse;
+import com.zorth.anima_web.model.dto.TmdbGenreResponse;
+import com.zorth.anima_web.model.dto.ChangesResponse;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
@@ -21,21 +27,60 @@ public class TmdbClient {
     public TmdbResponse getAnimeList(int page) {
         String url = UriComponentsBuilder.fromPath("/discover/tv")
                 .queryParam("api_key", tmdbConfig.getApiKey())
-                .queryParam("with_genres", 16) // Animation genre
+                .queryParam("with_keywords", "210024") // Anime keyword
                 .queryParam("sort_by", "first_air_date.desc")
                 .queryParam("page", page)
-                .queryParam("language", "zh-CN")  // 添加语言参数
-                .queryParam("include_adult", true)  // 排除成人内容
-                .queryParam("include_null_first_air_dates", false)  // 排除没有首播日期的内容
+                .queryParam("language", "zh-CN")
+                .queryParam("include_adult", false)
+                .queryParam("include_null_first_air_dates", false)
                 .build()
                 .toUriString();
         
         log.info("Requesting TMDB API: {}", url);
-        String rawResponse = tmdbRestTemplate.getForObject(url, String.class);
-        log.info("Raw TMDB API Response: {}", rawResponse);
+        ResponseEntity<String> rawResponse = tmdbRestTemplate.getForEntity(url, String.class);
+        log.info("Raw TMDB API Response: {}", rawResponse.getBody());
         
-        ResponseEntity<TmdbResponse> response = tmdbRestTemplate.getForEntity(url, TmdbResponse.class);
-        log.info("Parsed TMDB API Response: {}", response.getBody());
+        TmdbResponse response = parseResponse(rawResponse.getBody());
+        log.info("Parsed TMDB API Response: page={}, totalPages={}, totalResults={}, results.size={}", 
+                response.getPage(), response.getTotalPages(), response.getTotalResults(), 
+                response.getResults() != null ? response.getResults().size() : 0);
+        return response;
+    }
+    
+    private TmdbResponse parseResponse(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(json, TmdbResponse.class);
+        } catch (Exception e) {
+            log.error("Error parsing TMDB response: {}", e.getMessage());
+            throw new RuntimeException("Failed to parse TMDB response", e);
+        }
+    }
+
+    public TmdbGenreResponse getGenres() {
+        String url = UriComponentsBuilder.fromPath("/genre/tv/list")
+                .queryParam("api_key", tmdbConfig.getApiKey())
+                .queryParam("language", "zh-CN")
+                .build()
+                .toUriString();
+        
+        log.info("Requesting TMDB Genres API: {}", url);
+        ResponseEntity<TmdbGenreResponse> response = tmdbRestTemplate.getForEntity(url, TmdbGenreResponse.class);
+        log.info("Parsed TMDB Genres Response: {}", response.getBody());
+        return response.getBody();
+    }
+
+    public ChangesResponse getChanges(LocalDateTime startDate, LocalDateTime endDate) {
+        String url = UriComponentsBuilder.fromPath("/tv/changes")
+                .queryParam("api_key", tmdbConfig.getApiKey())
+                .queryParam("start_date", startDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .queryParam("end_date", endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .build()
+                .toUriString();
+        
+        log.info("Requesting TMDB Changes API: {}", url);
+        ResponseEntity<ChangesResponse> response = tmdbRestTemplate.getForEntity(url, ChangesResponse.class);
+        log.info("Parsed TMDB Changes Response: {}", response.getBody());
         return response.getBody();
     }
 } 

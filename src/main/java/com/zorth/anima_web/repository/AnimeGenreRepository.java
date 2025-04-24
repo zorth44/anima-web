@@ -1,17 +1,11 @@
 package com.zorth.anima_web.repository;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-
 import com.zorth.anima_web.model.entity.AnimeGenre;
+import com.zorth.anima_web.model.entity.AnimeGenreId;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Mapper
-public interface AnimeGenreRepository {
-    
-    @Insert("INSERT INTO anime_genre (anime_id, genre_id) VALUES (#{animeId}, #{genreId})")
-    void insert(AnimeGenre animeGenre);
-    
-    @Select("SELECT * FROM anime_genre WHERE anime_id = #{animeId} AND genre_id = #{genreId}")
-    AnimeGenre findByAnimeIdAndGenreId(Long animeId, Integer genreId);
+@Repository
+public interface AnimeGenreRepository extends JpaRepository<AnimeGenre, AnimeGenreId> {
+    void deleteByAnimeId(Long animeId);
 } 
