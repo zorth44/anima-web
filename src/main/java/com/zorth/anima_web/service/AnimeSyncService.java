@@ -83,7 +83,7 @@ public class AnimeSyncService {
         for (TmdbResponse.TmdbAnime show : results) {
             try {
                 // 更新或创建动漫记录
-                Anime anime = animeRepository.findByTmdbIdAndMediaType(show.getId(), MediaType.TV)
+                Anime anime = animeRepository.findByTmdbIdAndMediaType(show.getId(), MediaType.tv)
                         .orElse(new Anime());
                 
                 // 更新动漫信息
@@ -114,7 +114,7 @@ public class AnimeSyncService {
                 .orElseThrow(() -> new RuntimeException("Anime not found: " + tmdbId));
         
         // 更新或创建动漫记录
-        Anime anime = animeRepository.findByTmdbIdAndMediaType(tmdbId, MediaType.TV)
+        Anime anime = animeRepository.findByTmdbIdAndMediaType(tmdbId, MediaType.tv)
                 .orElse(new Anime());
         
         // 更新动漫信息
@@ -141,7 +141,7 @@ public class AnimeSyncService {
                 log.warn("Invalid first air date for anime {}: {}", response.getId(), response.getFirstAirDate());
             }
         }
-        anime.setMediaType(MediaType.TV);
+        anime.setMediaType(MediaType.tv);
         anime.setAdult(response.isAdult());
         anime.setPopularity(BigDecimal.valueOf(response.getPopularity()));
         anime.setVoteAverage(BigDecimal.valueOf(response.getVoteAverage()));
