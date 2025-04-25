@@ -11,10 +11,16 @@ import com.zorth.anima_web.config.TmdbConfig;
 import com.zorth.anima_web.model.dto.TmdbResponse;
 import com.zorth.anima_web.model.dto.TmdbGenreResponse;
 import com.zorth.anima_web.model.dto.ChangesResponse;
+import com.zorth.anima_web.model.dto.SeasonResponse;
+import com.zorth.anima_web.model.dto.TvDetailResponse;
+import com.zorth.anima_web.model.dto.SeasonDetailResponse;
+import com.zorth.anima_web.model.dto.EpisodeResponse;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -82,5 +88,66 @@ public class TmdbClient {
         ResponseEntity<ChangesResponse> response = tmdbRestTemplate.getForEntity(url, ChangesResponse.class);
         log.info("Parsed TMDB Changes Response: {}", response.getBody());
         return response.getBody();
+    }
+
+    /**
+     * 获取动漫的所有季节信息
+     * @param tvId TMDB的TV ID
+     * @return 季节信息列表
+     */
+    public List<SeasonResponse> getSeasons(Long tvId) {
+        String url = UriComponentsBuilder.fromPath("/tv/" + tvId)
+                .queryParam("api_key", tmdbConfig.getApiKey())
+                .queryParam("language", "zh-CN")
+                .build()
+                .toUriString();
+        
+        TvDetailResponse response = tmdbRestTemplate.getForObject(url, TvDetailResponse.class);
+        return response != null ? response.getSeasons() : Collections.emptyList();
+    }
+
+    /**
+     * 获取特定季节的详细信息
+     * @param tvId TMDB的TV ID
+     * @param seasonNumber 季节号
+     * @return 季节详细信息
+     */
+    public SeasonDetailResponse getSeasonDetail(Long tvId, Integer seasonNumber) {
+        String url = UriComponentsBuilder.fromPath("/tv/" + tvId + "/season/" + seasonNumber)
+                .queryParam("api_key", tmdbConfig.getApiKey())
+                .queryParam("language", "zh-CN")
+                .build()
+                .toUriString();
+        
+        return tmdbRestTemplate.getForObject(url, SeasonDetailResponse.class);
+    }
+
+    /**
+     * 获取特定季节的所有剧集信息
+     * @param tvId TMDB的TV ID
+     * @param seasonNumber 季节号
+     * @return 剧集信息列表
+     */
+    public List<EpisodeResponse> getEpisodes(Long tvId, Integer seasonNumber) {
+        SeasonDetailResponse seasonDetail = getSeasonDetail(tvId, seasonNumber);
+        return seasonDetail != null ? seasonDetail.getEpisodes() : Collections.emptyList();
+    }
+
+    public TmdbResponse.TmdbAnime getAnimeDetail(Long tmdbId) {
+        String url = UriComponentsBuilder.fromPath("/tv/" + tmdbId)
+                .queryParam("api_key", tmdbConfig.getApiKey())
+                .queryParam("language", "zh-CN")
+                .build()
+                .toUriString();
+        
+        log.info("Requesting TMDB Anime Detail API: {}", url);
+        ResponseEntity<TmdbResponse.TmdbAnime> response = tmdbRestTemplate.getForEntity(url, TmdbResponse.TmdbAnime.class);
+        log.info("Parsed TMDB Anime Detail Response: {}", response.getBody());
+        return response.getBody();
+    }
+
+    public TmdbResponse getAnimeChanges() {
+        String url = String.format("%s/tv/changes?api_key=%s", tmdbConfig.getBaseUrl(), tmdbConfig.getApiKey());
+        return tmdbRestTemplate.getForObject(url, TmdbResponse.class);
     }
 } 

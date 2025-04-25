@@ -1,5 +1,6 @@
 package com.zorth.anima_web.controller;
 
+import com.zorth.anima_web.service.AnimeService;
 import com.zorth.anima_web.service.AnimeSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AnimeSyncController {
     
+    private final AnimeService animeService;
     private final AnimeSyncService animeSyncService;
     
     @PostMapping("/all")
@@ -40,5 +42,11 @@ public class AnimeSyncController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Failed to sync changes: " + e.getMessage());
         }
+    }
+    
+    @PostMapping("/anime")
+    public ResponseEntity<String> syncAnimeData() {
+        animeService.syncAnimeData();
+        return ResponseEntity.ok("Anime synchronization started");
     }
 } 

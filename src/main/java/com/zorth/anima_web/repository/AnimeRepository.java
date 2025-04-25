@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface AnimeRepository extends JpaRepository<Anime, Long>, JpaSpecificationExecutor<Anime> {
     Optional<Anime> findByTmdbIdAndMediaType(Long tmdbId, MediaType mediaType);
     List<Anime> findByIsActiveTrue();
+    Optional<Anime> findByTmdbId(Long tmdbId);
 } 
