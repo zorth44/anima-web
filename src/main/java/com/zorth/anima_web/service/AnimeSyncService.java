@@ -28,22 +28,6 @@ public class AnimeSyncService {
     private final OriginCountryRepository originCountryRepository;
     private final AnimeService animeService;
     
-    @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点执行
-    @Transactional
-    public void syncChanges() {
-        log.info("开始同步动漫变更信息");
-        try {
-            TmdbResponse response = tmdbClient.getAnimeChanges();
-            if (response != null && response.getResults() != null) {
-                for (TmdbResponse.TmdbAnime anime : response.getResults()) {
-                    processChange(anime);
-                }
-            }
-        } catch (Exception e) {
-            log.error("同步动漫变更信息时发生错误: {}", e.getMessage(), e);
-        }
-    }
-    
     @Transactional
     protected void processChange(TmdbResponse.TmdbAnime anime) {
         try {

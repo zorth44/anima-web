@@ -33,17 +33,7 @@ public class AnimeSyncController {
             return ResponseEntity.badRequest().body("Failed to sync anime: " + e.getMessage());
         }
     }
-    
-    @PostMapping("/changes")
-    public ResponseEntity<String> syncChanges() {
-        try {
-            animeSyncService.syncChanges();
-            return ResponseEntity.ok("Changes synced successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to sync changes: " + e.getMessage());
-        }
-    }
-    
+
     @PostMapping("/anime")
     public ResponseEntity<String> syncAnimeData() {
         animeService.syncAnimeData();
