@@ -1,7 +1,6 @@
 package com.zorth.anima_web.config;
 
 import com.zorth.anima_web.service.AnimeService;
-import com.zorth.anima_web.service.AnimeSyncService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
