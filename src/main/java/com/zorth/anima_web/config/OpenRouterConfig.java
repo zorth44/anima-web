@@ -15,6 +15,9 @@ public class OpenRouterConfig {
     @Value("${openrouter.api.base-url}")
     private String baseUrl;
     
+    @Value("${openrouter.api.default-model}")
+    private String defaultModel;
+    
     @Bean
     public WebClient openRouterWebClient() {
         return WebClient.builder()
@@ -33,5 +36,9 @@ public class OpenRouterConfig {
     
     public String getBaseUrl() {
         return baseUrl;
+    }
+    
+    public String getDefaultModel() {
+        return defaultModel;
     }
 } 

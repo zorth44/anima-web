@@ -13,4 +13,5 @@ public interface AnimeRepository extends JpaRepository<Anime, Long>, JpaSpecific
     Optional<Anime> findByTmdbIdAndMediaType(Long tmdbId, MediaType mediaType);
     List<Anime> findByIsActiveTrue();
     Optional<Anime> findByTmdbId(Long tmdbId);
+    Optional<Anime> findFirstByNameContainingIgnoreCase(String name);
 } 

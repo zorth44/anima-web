@@ -24,3 +24,4 @@ openrouter:
   api:
     key: ${OPENROUTER_API_KEY}
     base-url: https://openrouter.ai/api/v1
+    default-model: anthropic/claude-3.7-sonnet

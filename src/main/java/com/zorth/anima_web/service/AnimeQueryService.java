@@ -9,10 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,31 @@ public class AnimeQueryService {
                 request.getSize(),
                 Sort.by(Sort.Direction.DESC, "firstAirDate")
             )
+        );
+    }
+
+    /**
+     * 根据动漫名称查询TMDB ID
+     * @param animeName 动漫名称
+     * @return TMDB ID
+     */
+    public Mono<Long> getTmdbIdByAnimeName(String animeName) {
+        return Mono.fromCallable((Callable<Long>) () -> {
+            // 使用模糊查询查找动漫
+            Optional<Anime> animeOpt = animeRepository.findFirstByNameContainingIgnoreCase(animeName);
+            return animeOpt.map(Anime::getTmdbId).orElse(null);
+        });
+    }
+    
+    /**
+     * 根据TMDB ID查询动漫信息
+     * @param tmdbId TMDB ID
+     * @return 动漫信息
+     */
+    public Mono<Anime> getAnimeByTmdbId(Long tmdbId) {
+        return Mono.fromCallable((Callable<Anime>) () -> 
+            animeRepository.findByTmdbId(tmdbId)
+                .orElseThrow(() -> new RuntimeException("Anime not found with tmdbId: " + tmdbId))
         );
     }
 } 
