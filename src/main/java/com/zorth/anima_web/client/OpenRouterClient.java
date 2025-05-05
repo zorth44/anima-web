@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -21,6 +22,14 @@ public class OpenRouterClient {
     
     private final WebClient openRouterWebClient;
     private final PromptStrategyFactory promptStrategyFactory;
+
+    // chatbot 返回流式响应
+    public Flux<String> chatCompletionStream(String model, List<OpenRouterRequest.Message> messages, 
+                                            Double temperature, Integer maxTokens) {
+        return chatCompletion(model, messages, temperature, maxTokens)
+                .flatMapMany(response -> Flux.fromIterable(response.getChoices()))
+                .map(choice -> choice.getMessage().getContent());
+    }
     
     // 通用聊天完成方法
     public Mono<OpenRouterResponse> chatCompletion(String model, List<OpenRouterRequest.Message> messages, 
